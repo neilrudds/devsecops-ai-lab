@@ -1,0 +1,19 @@
+title = "DevSecOps AI Lab"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "devsecops-demo-secret"
+description = "DevSecOps lab demonstration secret"
+
+regex = '''DEVSECOPS_DEMO_SECRET\s*=\s*["']?[A-Za-z0-9_-]{20,}["']?'''
+
+keywords = [
+  "DEVSECOPS_DEMO_SECRET"
+]
+
+tags = [
+  "demo",
+  "secret"
+]

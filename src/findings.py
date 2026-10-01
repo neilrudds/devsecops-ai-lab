@@ -3,6 +3,7 @@ from models import Finding
 import checkov_adapter
 import semgrep_adapter
 import trivy_adapter
+import gitleaks_adapter
 
 
 def load_all_findings() -> list[Finding]:
@@ -27,4 +28,9 @@ def load_all_findings() -> list[Finding]:
         )
     )
 
+    findings.extend(
+        gitleaks_adapter.load_findings(
+            "findings/gitleaks.json"
+        )
+    )
     return findings

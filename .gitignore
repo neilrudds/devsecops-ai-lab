@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 .pytest_cache/
 findings/*.json
+app/demo_secrets.txt

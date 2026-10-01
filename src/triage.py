@@ -87,10 +87,17 @@ def main() -> None:
         if finding.scanner == "trivy"
     ]
 
+    gitleaks_findings = [
+        finding
+        for finding in findings
+        if finding.scanner == "gitleaks"
+    ]
+
     findings_to_analyse = (
         checkov_findings[:1]
         + semgrep_findings[:1]
-        + trivy_findings[:2]
+        + trivy_findings[:1]
+        + gitleaks_findings[:1]
     )
 
     for index, finding in enumerate(findings_to_analyse, start=1):
