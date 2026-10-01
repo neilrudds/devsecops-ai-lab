@@ -1,0 +1,9 @@
+{
+  "scanner": "checkov",
+  "check_id": "CKV_AWS_24",
+  "severity": "HIGH",
+  "resource": "aws_security_group.web",
+  "file": "terraform/main.tf",
+  "line": 42,
+  "description": "Security group allows ingress from 0.0.0.0/0 to port 22"
+}
