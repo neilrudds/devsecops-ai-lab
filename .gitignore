@@ -5,3 +5,5 @@ __pycache__/
 .pytest_cache/
 findings/*.json
 app/demo_secrets.txt
+findings/ai_triage.json
+findings/*.md

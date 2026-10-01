@@ -96,6 +96,25 @@ jobs:
       - name: Display aggregated findings
         run: python src/report.py
 
+      - name: Run AI security triage
+        if: github.event_name != 'pull_request'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-6-luna
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is not configured"
+            exit 1
+          fi
+
+          python src/triage.py
+
+          
+      - name: Add AI triage to workflow summary
+        if: github.event_name != 'pull_request'
+        run: |
+          cat findings/ai_triage.md >> "$GITHUB_STEP_SUMMARY"
+
 
       - name: Upload security reports
         uses: actions/upload-artifact@v7
