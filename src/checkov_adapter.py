@@ -2,21 +2,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel
-
-
-class Finding(BaseModel):
-    scanner: str
-    finding_id: str
-    title: str
-    resource: str
-    file: str
-    line_start: int | None = None
-    line_end: int | None = None
-    severity: str | None = None
-    description: str | None = None
-    guideline: str | None = None
-
+from models import Finding
 
 def load_checkov_report(path: str) -> dict[str, Any]:
     report_path = Path(path)

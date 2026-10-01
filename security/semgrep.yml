@@ -1,0 +1,42 @@
+rules:
+
+  - id: python-dangerous-shell-true
+    languages:
+      - python
+
+    severity: ERROR
+
+    message: >
+      subprocess is executed with shell=True.
+      If user-controlled input reaches this call,
+      an attacker may be able to execute arbitrary shell commands.
+
+    patterns:
+      - pattern: subprocess.run(..., shell=True, ...)
+
+    metadata:
+      category: security
+      technology:
+        - python
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command"
+
+
+  - id: python-dangerous-eval
+    languages:
+      - python
+
+    severity: ERROR
+
+    message: >
+      eval() executes Python expressions dynamically.
+      User-controlled input could result in arbitrary code execution.
+
+    pattern: eval(...)
+
+    metadata:
+      category: security
+      technology:
+        - python
+      cwe:
+        - "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"

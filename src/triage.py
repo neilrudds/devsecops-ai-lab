@@ -4,7 +4,8 @@ from enum import Enum
 from openai import OpenAI
 from pydantic import BaseModel
 
-from checkov_adapter import Finding, load_findings
+from models import Finding
+from findings import load_all_findings
 
 
 class RiskLevel(str, Enum):
@@ -55,22 +56,48 @@ def analyse_finding(finding: Finding) -> SecurityAssessment:
 
 
 def main() -> None:
-    findings = load_findings("findings/checkov.json")
+    findings = load_all_findings()
 
-    print(f"Loaded {len(findings)} Checkov findings.\n")
+    for finding in findings:
+        print(finding.scanner, finding.finding_id, finding.resource)
+
+    print(
+        f"Loaded {len(findings)} security findings.\n"
+    )
 
     if not findings:
-        print("No failed Checkov findings found.")
+        print("No failed security findings found.")
         return
 
-    findings_to_analyse = findings[:3]
+    checkov_findings = [
+    finding
+    for finding in findings
+    if finding.scanner == "checkov"
+]
+
+    semgrep_findings = [
+        finding
+        for finding in findings
+        if finding.scanner == "semgrep"
+    ]
+
+    trivy_findings = [
+        finding
+        for finding in findings
+        if finding.scanner == "trivy"
+    ]
+
+    findings_to_analyse = (
+        checkov_findings[:1]
+        + semgrep_findings[:1]
+        + trivy_findings[:2]
+    )
 
     for index, finding in enumerate(findings_to_analyse, start=1):
 
         print("=" * 80)
         print(
-            f"Finding {index}/{len(findings)}: "
-            f"{index}/{len(findings_to_analyse)}"
+            f"Finding {index}/{len(findings_to_analyse)}"
         )
         print("=" * 80)
 
