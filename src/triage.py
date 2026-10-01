@@ -1,9 +1,10 @@
 import json
 from enum import Enum
-from pathlib import Path
 
 from openai import OpenAI
 from pydantic import BaseModel
+
+from checkov_adapter import Finding, load_findings
 
 
 class RiskLevel(str, Enum):
@@ -22,11 +23,7 @@ class SecurityAssessment(BaseModel):
     requires_human_review: bool
 
 
-def load_finding(path: str) -> dict:
-    return json.loads(Path(path).read_text())
-
-
-def analyse_finding(finding: dict) -> SecurityAssessment:
+def analyse_finding(finding: Finding) -> SecurityAssessment:
     client = OpenAI()
 
     response = client.responses.parse(
@@ -35,15 +32,20 @@ def analyse_finding(finding: dict) -> SecurityAssessment:
             {
                 "role": "system",
                 "content": (
-                    "You are a cloud security engineer reviewing automated "
-                    "DevSecOps scanner findings. Analyse the finding, explain "
-                    "the actual security risk, and recommend remediation. "
-                    "Do not assume the scanner severity is correct."
+                    "You are a senior cloud security engineer reviewing "
+                    "automated Infrastructure-as-Code security findings. "
+                    "Assess the actual risk of the finding rather than blindly "
+                    "accepting the scanner result. Explain a plausible exploit "
+                    "scenario, business impact, and specific remediation. "
+                    "Be concise and technically precise."
                 ),
             },
             {
                 "role": "user",
-                "content": json.dumps(finding),
+                "content": json.dumps(
+                    finding.model_dump(),
+                    indent=2
+                ),
             },
         ],
         text_format=SecurityAssessment,
@@ -52,8 +54,31 @@ def analyse_finding(finding: dict) -> SecurityAssessment:
     return response.output_parsed
 
 
-if __name__ == "__main__":
-    finding = load_finding("findings/sample_finding.json")
-    assessment = analyse_finding(finding)
+def main() -> None:
+    findings = load_findings("findings/checkov.json")
 
-    print(assessment.model_dump_json(indent=2))
+    print(f"Loaded {len(findings)} Checkov findings.\n")
+
+    if not findings:
+        print("No failed Checkov findings found.")
+        return
+
+    findings_to_analyse = findings[:3]
+
+    for index, finding in enumerate(findings_to_analyse, start=1):
+
+        print("=" * 80)
+        print(
+            f"Finding {index}/{len(findings)}: "
+            f"{index}/{len(findings_to_analyse)}"
+        )
+        print("=" * 80)
+
+        assessment = analyse_finding(finding)
+
+        print(assessment.model_dump_json(indent=2))
+        print()
+
+
+if __name__ == "__main__":
+    main()
